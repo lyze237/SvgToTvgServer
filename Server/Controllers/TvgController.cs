@@ -8,8 +8,10 @@ using Microsoft.Extensions.Options;
 using SvgToTvgServer.Server.Settings;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using ImageMagick;
 using SvgToTvgServer.Server.Extensions;
+using SvgToTvgServer.Server.Worker;
 using SvgToTvgServer.Shared;
 
 namespace SvgToTvgServer.Server.Controllers
@@ -20,11 +22,13 @@ namespace SvgToTvgServer.Server.Controllers
     {
         private readonly ILogger<TvgController> logger;
         private readonly TvgConfig config;
+        private readonly TvgBackgroundTaskQueue taskQueue;
 
-        public TvgController(ILogger<TvgController> logger, IOptions<TvgConfig> config)
+        public TvgController(ILogger<TvgController> logger, IOptions<TvgConfig> config, TvgBackgroundTaskQueue taskQueue)
         {
             this.logger = logger;
             this.config = config.Value;
+            this.taskQueue = taskQueue;
         }
 
         [HttpPost]
@@ -33,6 +37,14 @@ namespace SvgToTvgServer.Server.Controllers
             if (string.IsNullOrEmpty(svg))
                 return BadRequest("Input svg is empty.");
 
+            var workerEntry = new TvgWorkerEntry(BuildBackgroundWorkerItem(svg));
+            await taskQueue.QueueBackgroundWorkItemAsync(workerEntry);
+
+            return await workerEntry.Result.Task;
+        }
+
+        private async ValueTask<IActionResult> BuildBackgroundWorkerItem(string svg)
+        {
             var optimizedSvg = await OptimizeSvg(svg);
             if (optimizedSvg.ExitCode != 0)
                 return BadRequest($"Error optimizing svg file.\n{optimizedSvg.StdErr}");
@@ -87,7 +99,7 @@ namespace SvgToTvgServer.Server.Controllers
                 }
             });
         }
-        
+
         private async Task<ProcessResult> OptimizeSvg(string svg)
         {
             var info = new ProcessStartInfo(config.Svgo)

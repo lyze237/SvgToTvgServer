@@ -8,6 +8,8 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using AspNetCoreRateLimit;
 using SvgToTvgServer.Server.Settings;
+using SvgToTvgServer.Server.Worker;
+using TvgWorker = SvgToTvgServer.Server.Worker.TvgWorker;
 
 namespace SvgToTvgServer.Server
 {
@@ -30,6 +32,9 @@ namespace SvgToTvgServer.Server
             services.AddRazorPages();
             
             services.Configure<TvgConfig>(Configuration.GetSection("Tvg"));
+
+            services.AddSingleton(_ => new TvgBackgroundTaskQueue(100));
+            services.AddHostedService<TvgWorker>();
         }
 
         private void ConfigureRateLimiter(IServiceCollection services)

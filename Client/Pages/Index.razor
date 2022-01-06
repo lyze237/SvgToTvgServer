@@ -18,7 +18,12 @@
             <Heading Size="HeadingSize.Is5">Upload</Heading>
         </CollapseHeader>
         <CollapseBody>
-            <FileEdit Filter=".svg" Changed="@SetSvgFile" />
+            <Alert @ref="uploadErrorAlert" Color="Color.Danger">
+                <AlertMessage>
+                    <code><MultilineString Value="@uploadErrorMessage"/></code>
+                </AlertMessage>
+            </Alert>
+            <FileEdit Filter=".svg" Changed="@SetSvgFile"/>
             <Button class="mt-3" Loading="isLoadingResult" Color="Color.Primary" PreventDefaultOnSubmit="true" disabled="@disableSubmitButton" Clicked="SubmitSvgFile">Upload</Button>
         </CollapseBody>
     </Collapse>
@@ -64,6 +69,9 @@
     private bool isLoadingResult;
     private TvgResult result;
 
+    private Alert uploadErrorAlert;
+    private string uploadErrorMessage;
+
     private readonly Dictionary<int, bool> states = new();
     private void ToggleAccordion(int index)
     {
@@ -78,10 +86,12 @@
         return states.ContainsKey(index) && states[index];
     }
 
-    private void SetSvgFile(FileChangedEventArgs arg)
+    private async Task SetSvgFile(FileChangedEventArgs arg)
     {
         svgFile = arg.Files.FirstOrDefault();
         disableSubmitButton = svgFile == null;
+        
+        await uploadErrorAlert.Hide();
     }
     
     private async Task SubmitSvgFile()
@@ -91,7 +101,16 @@
         var content = new MultipartFormDataContent();
         content.Add(new StreamContent(svgFile.OpenReadStream()), "svg");
         var response = await http.PostAsync("Tvg", content);
-        result = response.Content.ReadFromJsonAsync<TvgResult>().Result;
+        if (response.IsSuccessStatusCode)
+        {
+            result = response.Content.ReadFromJsonAsync<TvgResult>().Result;
+        }
+        else
+        {
+            result = null;
+            uploadErrorMessage = ((MarkupString) await response.Content.ReadAsStringAsync()).ToString();
+            await uploadErrorAlert.Show();
+        }
         isLoadingResult = false;
     }
 
@@ -100,5 +119,4 @@
 
     private async Task DownloadStep(TvgStep step) =>
         await downloader.DownloadFileAsync($"{Path.GetFileNameWithoutExtension(svgFileName)}.{step.Extension}", step.IsBase64 ? Convert.FromBase64String(step.FileContent) : Encoding.UTF8.GetBytes(step.FileContent));
-
 }

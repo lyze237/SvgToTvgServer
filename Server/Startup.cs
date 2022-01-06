@@ -62,7 +62,6 @@ namespace SvgToTvgServer.Server
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 

@@ -1,0 +1,17 @@
+﻿@page "/about"
+
+<Jumbotron Background="Background.Body" Margin="Margin.Is4">
+    <JumbotronTitle Size="JumbotronTitleSize.Is2">TinyVG</JumbotronTitle>
+    <JumbotronSubtitle>
+        An alternative binary encoded vector graphics format.
+    </JumbotronSubtitle>
+    <Divider></Divider>
+    <Paragraph>
+        SVG is a horribly complex format and an overkill for most projects. The specification includes way too many edge cases so implementing a new SVG renderer will always have drawbacks or missing pieces.<br />
+
+        TinyVG tries to be simpler. Fewer features, but powerful enough to cover 90% of use cases. <br /><br />
+        
+        This services uses <a href="https://github.com/svg/svgo">svgo</a>, svg2tvg, tvg-text, tvg-renderer to convert your svg file over to a tvg file.
+    </Paragraph>
+    <Button Color="Color.Primary" Outline To="https://tinyvg.tech">More Infos</Button>
+</Jumbotron>

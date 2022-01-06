@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using AspNetCoreRateLimit;
 using SvgToTvgServer.Server.Settings;
 
 namespace SvgToTvgServer.Server
@@ -23,11 +24,22 @@ namespace SvgToTvgServer.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            ConfigureRateLimiter(services);
 
             services.AddControllersWithViews();
             services.AddRazorPages();
             
             services.Configure<TvgConfig>(Configuration.GetSection("Tvg"));
+        }
+
+        private void ConfigureRateLimiter(IServiceCollection services)
+        {
+            services.AddOptions();
+            services.AddMemoryCache();
+            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
+            services.AddInMemoryRateLimiting();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +61,7 @@ namespace SvgToTvgServer.Server
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
+            app.UseIpRateLimiting();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

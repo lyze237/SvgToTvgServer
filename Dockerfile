@@ -30,11 +30,10 @@ RUN ls /app/publish
 FROM node:buster
 WORKDIR /app
 RUN npm -g install svgo
-EXPOSE 80
+EXPOSE $PORT
 COPY Server/Tools/ /tools/
 COPY --from=dotnet /app/publish .
 COPY --from=tvg /app/ /tools/
 COPY --from=rust /app/sdk/src/tools/svg2tvgt/target/release/svg2tvgt /tools/svg2tvgt
-RUN ls -la
-ENTRYPOINT ["./SvgToTvgServer.Server", "--urls", "http://*:80"]
+CMD ./SvgToTvgServer.Server --urls http://*:$PORT
 

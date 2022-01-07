@@ -20,3 +20,7 @@
 code {
     word-wrap: anywhere;
 }
+
+.card-body > img {
+    width: 100%;
+}

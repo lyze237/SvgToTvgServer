@@ -123,7 +123,7 @@ namespace SvgToTvgServer.Server.Controllers
             
             await process.WaitForExitAsync();
             
-            logger.LogInfoWhenNotEmpty(stdout);
+            logger.LogDebugWhenNotEmpty(stdout);
             logger.LogErrorWhenNotEmpty(stderr);
             
             logger.LogInformation($"Exit code {process.ExitCode}");
@@ -159,7 +159,7 @@ namespace SvgToTvgServer.Server.Controllers
             
             await process.WaitForExitAsync();
             
-            logger.LogInfoWhenNotEmpty(stdout);
+            logger.LogDebugWhenNotEmpty(stdout);
             logger.LogErrorWhenNotEmpty(stderr);
             
             logger.LogInformation($"Exit code {process.ExitCode}");
@@ -242,7 +242,7 @@ namespace SvgToTvgServer.Server.Controllers
             await process.WaitForExitAsync();
             
             logger.LogInformation(file.FullName);
-            logger.LogInfoWhenNotEmpty(stdout);
+            logger.LogDebugWhenNotEmpty(stdout);
             logger.LogErrorWhenNotEmpty(stderr);
             logger.LogInformation($"Exit code {process.ExitCode}");
             

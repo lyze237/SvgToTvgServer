@@ -14,5 +14,6 @@ namespace SvgToTvgServer.Shared
         public string Extension { get; set; }
         public string FileContent { get; set; }
         public bool IsBase64 { get; set; }
+        public string Errors { get; set; }
     }
 }

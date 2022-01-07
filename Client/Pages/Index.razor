@@ -34,13 +34,20 @@
         {
             var step = result.Steps[i];
             var idx = i;
-            <Collapse Visible="false">
+            <Collapse Visible="@IsAccordionVisible(i)">
                 <CollapseHeader>
                     <Heading Size="HeadingSize.Is5">
-                        <Button Color="Color.Info" Outline Clicked="() => DownloadStep(step)">@step.StepName</Button> <Button Color="Color.Primary" class="float-right" Clicked="() => DownloadStep(step)"><Icon Name="IconName.Download" /></Button>
+                        @step.StepName
+                        <Button Color="Color.Primary" title="Download" class="float-right" Clicked="() => DownloadStep(step)"><Icon Name="IconName.Download"/></Button>
+                        @if (!string.IsNullOrWhiteSpace(step.Errors))
+                        {
+                            <Button Color="Color.Warning" title="Warnings" class="mr-1 float-right" Clicked="() => ToggleAccordion(idx)"><Icon Name="IconName.ExclamationTriangle"/></Button>
+                        }
                     </Heading>
                 </CollapseHeader>
-                <CollapseBody></CollapseBody>
+                <CollapseBody>
+                    <code><MultilineString Value="@step.Errors"></MultilineString></code>
+                </CollapseBody>
             </Collapse>
         }
         
@@ -68,6 +75,20 @@
     private Alert uploadErrorAlert;
     private string uploadErrorMessage;
 
+    private readonly Dictionary<int, bool> states = new();
+    private void ToggleAccordion(int index)
+    {
+        var isVisible = IsAccordionVisible(index);
+        states[index] = !isVisible;
+        Console.WriteLine($"Toggle Accordion {index} from {isVisible} to {states[index]}");
+    }
+
+    private bool IsAccordionVisible(int index)
+    {
+        Console.WriteLine($"Is According Visible? {index}");
+        return states.ContainsKey(index) && states[index];
+    }
+    
     private async Task SetSvgFile(FileChangedEventArgs arg)
     {
         svgFile = arg.Files.FirstOrDefault();

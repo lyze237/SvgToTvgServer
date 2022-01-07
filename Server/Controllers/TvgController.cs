@@ -73,6 +73,7 @@ namespace SvgToTvgServer.Server.Controllers
                         StepName = "Tvgt File",
                         Extension = "tvgt",
                         FileContent = tvgt.StdOut,
+                        Errors = tvgt.StdErr,
                         IsBase64 = false
                     },
                     new()
@@ -80,6 +81,7 @@ namespace SvgToTvgServer.Server.Controllers
                         StepName = "Tvg File",
                         Extension = "tvg",
                         FileContent = Convert.ToBase64String(tvg.Bytes),
+                        Errors = tvg.StdErr,
                         IsBase64 = true
                     }
                 }

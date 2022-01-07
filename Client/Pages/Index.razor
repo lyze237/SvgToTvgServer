@@ -96,22 +96,30 @@
     
     private async Task SubmitSvgFile()
     {
-        isLoadingResult = true;
-        svgFileName = svgFile.Name;
-        var content = new MultipartFormDataContent();
-        content.Add(new StreamContent(svgFile.OpenReadStream()), "svg");
-        var response = await http.PostAsync("Tvg", content);
-        if (response.IsSuccessStatusCode)
+        try
         {
-            result = response.Content.ReadFromJsonAsync<TvgResult>().Result;
-        }
-        else
+            isLoadingResult = true;
+            svgFileName = svgFile.Name;
+            var content = new MultipartFormDataContent();
+            content.Add(new StreamContent(svgFile.OpenReadStream(32 * 1000 * 1000)), "svg");
+            var response = await http.PostAsync("Tvg", content);
+            if (response.IsSuccessStatusCode)
+            {
+                result = response.Content.ReadFromJsonAsync<TvgResult>().Result;
+            }
+            else
+            {
+                result = null;
+                uploadErrorMessage = await response.Content.ReadAsStringAsync();
+                await uploadErrorAlert.Show();
+            }
+            isLoadingResult = false;
+        } 
+        catch (Exception e)
         {
-            result = null;
-            uploadErrorMessage = ((MarkupString) await response.Content.ReadAsStringAsync()).ToString();
+            uploadErrorMessage = $"Couldn't upload file.\n{e.Message}";
             await uploadErrorAlert.Show();
         }
-        isLoadingResult = false;
     }
 
     private async Task DownloadImage() => 

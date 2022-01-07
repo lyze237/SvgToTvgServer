@@ -34,17 +34,13 @@
         {
             var step = result.Steps[i];
             var idx = i;
-            <Collapse Visible="@IsAccordionVisible(i)">
+            <Collapse Visible="false">
                 <CollapseHeader>
                     <Heading Size="HeadingSize.Is5">
-                        <Button Color="Color.Info" Outline Clicked="() => ToggleAccordion(idx)">@step.StepName</Button> <Button Color="Color.Primary" class="float-right" Clicked="() => DownloadStep(step)"><Icon Name="IconName.Download" /></Button>
+                        <Button Color="Color.Info" Outline Clicked="() => DownloadStep(step)">@step.StepName</Button> <Button Color="Color.Primary" class="float-right" Clicked="() => DownloadStep(step)"><Icon Name="IconName.Download" /></Button>
                     </Heading>
                 </CollapseHeader>
-                <CollapseBody>
-                    <code>
-                        @step.FileContent
-                    </code>
-                </CollapseBody>
+                <CollapseBody></CollapseBody>
             </Collapse>
         }
         
@@ -71,20 +67,6 @@
 
     private Alert uploadErrorAlert;
     private string uploadErrorMessage;
-
-    private readonly Dictionary<int, bool> states = new();
-    private void ToggleAccordion(int index)
-    {
-        var isVisible = IsAccordionVisible(index);
-        states[index] = !isVisible;
-        Console.WriteLine($"Toggle Accordion {index} from {isVisible} to {states[index]}");
-    }
-
-    private bool IsAccordionVisible(int index)
-    {
-        Console.WriteLine($"Is According Visible? {index}");
-        return states.ContainsKey(index) && states[index];
-    }
 
     private async Task SetSvgFile(FileChangedEventArgs arg)
     {

@@ -70,13 +70,6 @@ namespace SvgToTvgServer.Server.Controllers
                 {
                     new()
                     {
-                        StepName = "Optimized Svg",
-                        Extension = ".svg",
-                        FileContent = optimizedSvg.StdOut,
-                        IsBase64 = false
-                    },
-                    new()
-                    {
                         StepName = "Tvgt File",
                         Extension = "tvgt",
                         FileContent = tvgt.StdOut,
@@ -87,13 +80,6 @@ namespace SvgToTvgServer.Server.Controllers
                         StepName = "Tvg File",
                         Extension = "tvg",
                         FileContent = Convert.ToBase64String(tvg.Bytes),
-                        IsBase64 = true
-                    },
-                    new()
-                    {
-                        StepName = "Tga File",
-                        Extension = "tga",
-                        FileContent = Convert.ToBase64String(tga.Bytes),
                         IsBase64 = true
                     }
                 }
